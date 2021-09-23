@@ -4,6 +4,8 @@ class Fuzzy:
         self.__parametros = [-10, -5, -1, 1, 5, 10]
         self.__erro_atual = 0
         self.__delta_erro = 0
+        self.__grau_erro = {"MN": 0.0, "N": 0.0, "PN": 0.0, "PP": 0.0, "P": 0.0, "MP": 0.0}
+        self.__grau_Drro = {"MN": 0.0, "N": 0.0, "PN": 0.0, "PP": 0.0, "P": 0.0, "MP": 0.0}
 
     def calcula_erro(self, valor_atual, valor_anterior):
         erro_atual = self.__setpoint - valor_atual
@@ -11,116 +13,178 @@ class Fuzzy:
         delta_erro = erro_atual - erro_anterior
         self.__erro_atual = erro_atual
         self.__delta_erro = delta_erro
-        print("erro = {}\nerro_anterior = {}\nresultando em um delta erro = {}".format(self.__erro_atual, erro_anterior,  self.__delta_erro))
         return self.__erro_atual, self.__delta_erro
 
     def __calcula_grau_erro(self):
         grau_1 = 0
         grau_2 = 0
         tipo_erro = []
-        print(self.__parametros)
         if self.__erro_atual <= self.__parametros[0]:
-            grau_1 = 1
-            grau_2 = 0
-            tipo_erro = ["MN"]
+            MN = 1
+            N = 0
+            PN = 0
+            PP = 0
+            P = 0
+            MP = 0
         elif self.__parametros[0] < self.__erro_atual <= self.__parametros[1]:
             A = self.__parametros[0]
             B = self.__parametros[1]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["MN", "N"]
+            erro = self.__erro_atual
+            MN = (1 / (B - A)) * erro + (A / (A - B))
+            N = (1 / (A - B)) * erro + (B / (B - A))
+            PN = 0
+            PP = 0
+            P = 0
+            MP = 0
         elif self.__parametros[1] < self.__erro_atual <= self.__parametros[2]:
             A = self.__parametros[1]
             B = self.__parametros[2]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["N", "PN"]
+            erro = self.__erro_atual
+            MN = 0
+            N = (1 / (B - A)) * erro + (A / (A - B))
+            PN = (1 / (A - B)) * erro + (B / (B - A))
+            PP = 0
+            P = 0
+            MP = 0
         elif self.__parametros[2] < self.__erro_atual <= self.__parametros[3]:
             A = self.__parametros[2]
             B = self.__parametros[3]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["PN", "PP"]
+            erro = self.__erro_atual
+            MN = 0
+            N = 0
+            PN = (1 / (B - A)) * erro + (A / (A - B))
+            PP = (1 / (A - B)) * erro + (B / (B - A))
+            P = 0
+            MP = 0
         elif self.__parametros[3] < self.__erro_atual <= self.__parametros[4]:
             A = self.__parametros[3]
             B = self.__parametros[4]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["PP", "P"]
+            erro = self.__erro_atual
+            MN = 0
+            N = 0
+            PN = 0
+            PP = (1 / (B - A)) * erro + (A / (A - B))
+            P = (1 / (A - B)) * erro + (B / (B - A))
+            MP = 0
         elif self.__parametros[4] < self.__erro_atual < self.__parametros[5]:
             A = self.__parametros[4]
             B = self.__parametros[5]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["P", "MP"]
+            erro = self.__erro_atual
+            MN = 0
+            N = 0
+            PN = 0
+            PP = 0
+            P = (1 / (B - A)) * erro + (A / (A - B))
+            MP = (1 / (A - B)) * erro + (B / (B - A))
         elif self.__parametros[5] <= self.__erro_atual:
-            grau_1 = 1
-            grau_2 = 0
-            tipo_erro = ["MP"]
-        print("grau_1_E = {}   grau_2_E= {}   tipo_E= {}".format(grau_1, grau_2, tipo_erro))
-        return grau_1, grau_2, tipo_erro
+            MN = 0
+            N = 0
+            PN = 0
+            PP = 0
+            P = 0
+            MP = 1
+        self.__grau_erro["MN"] = MN
+        self.__grau_erro["N"] = N
+        self.__grau_erro["PN"] = PN
+        self.__grau_erro["PP"] = PP
+        self.__grau_erro["P"] = P
+        self.__grau_erro["MP"] = MP
 
     def __calcula_grau_delta_erro(self):
         grau_1 = 1
         grau_2 = 0
         tipo_erro = []
         if self.__delta_erro <= self.__parametros[0]:
-            grau_1 = 1
-            grau_2 = 0
-            tipo_erro = ["MN"]
+            MN = 1
+            N = 0
+            PN = 0
+            PP = 0
+            P = 0
+            MP = 0
         elif self.__parametros[0] < self.__delta_erro <= self.__parametros[1]:
             A = self.__parametros[0]
             B = self.__parametros[1]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["MN", "N"]
+            erro = self.__erro_atual
+            MN = (1 / (B - A)) + (A / (A - B))
+            N = (1 / (A - B)) + (B / (B - A))
+            PN = 0
+            PP = 0
+            P = 0
+            MP = 0
         elif self.__parametros[1] < self.__delta_erro <= self.__parametros[2]:
             A = self.__parametros[1]
             B = self.__parametros[2]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["N", "PN"]
+            erro = self.__erro_atual
+            MN = 0
+            N = (1 / (B - A)) + (A / (A - B))
+            PN = (1 / (A - B)) + (B / (B - A))
+            PP = 0
+            P = 0
+            MP = 0
         elif self.__parametros[2] < self.__delta_erro <= self.__parametros[3]:
             A = self.__parametros[2]
             B = self.__parametros[3]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["PN", "PP"]
+            erro = self.__erro_atual
+            MN = 0
+            N = 0
+            PN = (1 / (B - A)) * erro + (A / (A - B))
+            PP = (1 / (A - B)) * erro + (B / (B - A))
+            P = 0
+            MP = 0
         elif self.__parametros[3] < self.__delta_erro <= self.__parametros[4]:
             A = self.__parametros[3]
             B = self.__parametros[4]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["PP", "P"]
+            erro = self.__erro_atual
+            MN = 0
+            N = 0
+            PN = 0
+            PP = (1 / (B - A)) * erro + (A / (A - B))
+            P = (1 / (A - B)) * erro + (B / (B - A))
+            MP = 0
         elif self.__parametros[4] < self.__delta_erro < self.__parametros[5]:
             A = self.__parametros[4]
             B = self.__parametros[5]
-            grau_1 = (1 / (B - A)) + (A / (A - B))
-            grau_2 = (1 / (A - B)) + (B / (B - A))
-            tipo_erro = ["P", "MP"]
+            erro = self.__erro_atual
+            MN = 0
+            N = 0
+            PN = 0
+            PP = 0
+            P = (1 / (B - A)) * erro + (A / (A - B))
+            MP = (1 / (A - B)) * erro + (B / (B - A))
         elif self.__parametros[5] <= self.__delta_erro:
-            grau_1 = 1
-            grau_2 = 0
-            tipo_erro = ["MP"]
-        print("grau_1_DE = {}   grau_2_DE= {}   tipo_DE= {}".format(grau_1, grau_2, tipo_erro))
-        return grau_1, grau_2, tipo_erro
+            MN = 0
+            N = 0
+            PN = 0
+            PP = 0
+            P = 0
+            MP = 1
+        self.__grau_Drro["MN"] = MN
+        self.__grau_Drro["N"] = N
+        self.__grau_Drro["PN"] = PN
+        self.__grau_Drro["PP"] = PP
+        self.__grau_Drro["P"] = P
+        self.__grau_Drro["MP"] = MP
 
     def calcula_grau(self):
-        # try:
-            # calcular grau 1 e 2 do erro
-            self.__calcula_grau_erro()
-            #calcula grau 1 e 2 do delta erro
-            self.__calcula_grau_delta_erro()
-        # except:
-        #     print("ERRO")
+        self.__calcula_grau_erro()
+        self.__calcula_grau_delta_erro()
+        return self.__grau_erro, self.__grau_Drro
 
     def mostra_parametros(self):
-        print(self.__parametros[0])
-        print(self.__parametros[1])
-        print(self.__parametros[2])
-        print(self.__parametros[3])
-        print(self.__parametros[4])
-        print(self.__parametros[5])
+        texto = [self.__parametros[0], self.__parametros[1],
+                 self.__parametros[2], self.__parametros[3],
+                 self.__parametros[4], self.__parametros[5]]
+        text = f'''
+            MN = {texto[0]}
+            PN = {texto[1]}
+            N = {texto[2]}
+            P = {texto[3]}
+            PP = {texto[4]}
+            MP = {texto[5]}
+            '''
+
+        return text
+
     @property
     def setpoint(self):
         print(self.__setpoint)

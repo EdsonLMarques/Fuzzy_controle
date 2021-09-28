@@ -1,0 +1,18 @@
+# Second version of Fuzzy controler in python
+#
+#fuzzy:
+#Error and delta error = MN, N, PN, PP, P, MP ( 6 values that you have to decide the value)
+#error and delta error are composed with 2 ramp equations with x variable values
+# rule bases (you have to decide each intersection)
+#    MN   N   PN   PP   P   MP
+#MN|
+# N|
+#PN|
+#PP|
+# P|
+#MP|
+#
+#Fuzzy output = MB, B, M, A, MA ( 6 values that you have to decide the value)
+#fuzzy output = each value are composed with 2 ramp equations with x variable values
+#
+#I created a object caled Fuzzy, it are composed with some useful functions like calcula_erro that show the error value
